@@ -1,0 +1,27 @@
+Excercice Message et Nommage
+
+'Hello, Dave' "String".
+1.3. "Small Float"
+#node1. "a byte symbol"
+#(2 33 4). "a array width =3 "
+[ :each | each scale: 1.5 ]. "a block closure"
+$A. "Charater"
+true. "a true"
+1. "a small integer"
+
+"Exercice Message"
+
+3+4. "7"
+Date today. "8 janvier 2021"
+anArray at: 1 put: 'hello'.
+anArray at: i.
+#(2 33 -4 67) collect: [ :each | each abs] . "#(2 33 4 67)"
+25 @ 50. "Point aux coordonnées 25 et 50"
+SmallInteger maxVal. "SmallInteger"
+#(a b c d e f) includesAll: #(f d b). "true, arguments f d b"
+true | false.
+Point selectors.
+
+"Exercice nommage"
+"Tranferator puisqu'il y a une majuscule alors c'est une classe"
+"rectangle une variable représentant un rectangle "
