@@ -18,22 +18,22 @@ Counter >> count [
 	^ count
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accesing }
 Counter >> count: anInteger [ 
 	count := anInteger
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #acccessing }
 Counter >> decrement [
 	^ self count: (self count) - 1.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accesing }
 Counter >> increment [
 	^ self count: (self count) + 1.
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accesing }
 Counter >> increment2 [
 	^ self count: (self count) + 2.
 ]
@@ -45,9 +45,9 @@ Counter >> initialize [
 ]
 
 { #category : #'as yet unclassified' }
-Counter >> printOn: asStream [
+Counter >> printOn: aStream [
 
-	super printOn: asStream.
-	asStream nextPutAll: ' with value: ', count printString.
-	asStream cr
+	super printOn: aStream.
+	aStream nextPutAll: ' withValue: ' , count printString.
+	aStream cr
 ]
