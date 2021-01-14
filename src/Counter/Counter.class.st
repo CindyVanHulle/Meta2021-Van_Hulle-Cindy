@@ -34,6 +34,11 @@ Counter >> increment [
 ]
 
 { #category : #'as yet unclassified' }
+Counter >> increment2 [
+	^ self count: (self count) + 2.
+]
+
+{ #category : #'as yet unclassified' }
 Counter >> initialize [
 	super initialize .
 	count := 0.	

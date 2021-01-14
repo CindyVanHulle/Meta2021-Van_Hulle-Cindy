@@ -31,6 +31,15 @@ self assert: c count equals: 2
 ]
 
 { #category : #tests }
+TestCounter >> testIncrement2 [
+| c |
+c := Counter new.
+c count: 1.
+c increment2.
+self assert: c count equals: 3
+]
+
+{ #category : #tests }
 TestCounter >> testInitialize [
 | c |
 c := Counter new.
