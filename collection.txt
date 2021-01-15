@@ -1,0 +1,18 @@
+Étant donné la collection col := #(1 2 3 -44 0 5 6 4 5 -3 22 1 2 5)…
+
+   1. Donnez l’expression qui rend la liste des nombres positifs
+   
+   ^ col do:[:each | abs each]
+  
+   2. Donnez l’expression qui rend la liste des carrés des nombres
+   
+   ^ col do: [:each | each * each ]
+   
+   3. Donnez l’expression qui rend la somme des nombres
+   |res|
+   res:=0.
+   ^ col do: [:each | res := res + each ]
+   
+   4. Donnez l’expression qui rend le premier nombre négatif
+
+      
