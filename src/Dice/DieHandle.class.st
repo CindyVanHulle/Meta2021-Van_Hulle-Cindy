@@ -8,6 +8,16 @@ Class {
 }
 
 { #category : #initialization }
+DieHandle >> + aDieHandle [
+
+	| handle |
+	handle := DieHandle new.
+	self dices do: [ :each | handle addDie: each ].
+	aDieHandle dices do: [ :each | handle addDie: each ].
+	^ handle
+]
+
+{ #category : #initialization }
 DieHandle >> addDie: aDie [
 
 	dice add: aDie.
