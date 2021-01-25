@@ -19,8 +19,9 @@ EMultiplication class >> left: anExp right: anExp2 [
 ]
 
 { #category : #accessing }
-EMultiplication >> evaluate [
-	^ left evaluate * right evaluate 
+EMultiplication >> evaluateWith: anObject [
+	^ (left evaluateWith: anObject)
+		* (right evaluateWith: anObject )
 ]
 
 { #category : #accessing }
