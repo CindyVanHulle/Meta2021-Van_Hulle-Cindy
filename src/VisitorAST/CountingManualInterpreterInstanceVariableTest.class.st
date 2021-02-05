@@ -1,18 +1,18 @@
 Class {
-	#name : #CountingManualInterpreterSelfTest,
+	#name : #CountingManualInterpreterInstanceVariableTest,
 	#superclass : #TestCase,
 	#category : #VisitorAST
 }
 
 { #category : #tests }
-CountingManualInterpreterSelfTest >> testSelfCount [ 
+CountingManualInterpreterInstanceVariableTest >> testInstanceVariableCount [ 
 	"Point >> sideOf: otherPoint
 	| side |
 	side := (self crossProduct: otherPoint) sign.
 	^ { #right . #center . #left } at: side + 2 "
 	| ast counting |   
 	ast := RBParser parseMethod: (Point >> #sideOf:) sourceCode.  
-	counting := CountingManualInterpreterSelf new.  
+	counting := CountingManualInterpreterInstanceVariable new.  
 	ast acceptVisitor: counting.  
-	self assert: counting numberOfSelf equals: 1
+	self assert: counting numberOfInstanceVariable equals: 1
 ]
