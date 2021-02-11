@@ -1,6 +1,9 @@
 Class {
 	#name : #CHInterpretable,
 	#superclass : #Object,
+	#instVars : [
+		'x'
+	],
 	#category : #'Champollion-Tests'
 }
 
@@ -27,4 +30,34 @@ CHInterpretable >> returnInteger [
 { #category : #'as yet unclassified' }
 CHInterpretable >> returnRecursiveLiteralArray [ 
 	^ #(true 1 #('ahah'))
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> returnSelf [
+	^ self
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> returnSuper [
+	^ super
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> returnX [
+	^ x
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> store100IntoX [
+	^ x := 100
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> x [
+	^ x
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> x: anInteger [
+	x := anInteger 
 ]
