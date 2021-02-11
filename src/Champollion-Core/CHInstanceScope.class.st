@@ -1,5 +1,5 @@
 Class {
-	#name : #CHInstanceCore,
+	#name : #CHInstanceScope,
 	#superclass : #Object,
 	#instVars : [
 		'receiver',
@@ -9,38 +9,38 @@ Class {
 }
 
 { #category : #accessing }
-CHInstanceCore >> definedVariables [
+CHInstanceScope >> definedVariables [
 	^ receiver class allInstVarNames 
 ]
 
 { #category : #accessing }
-CHInstanceCore >> parentScope [
+CHInstanceScope >> parentScope [
 	^ parentScope 
 ]
 
 { #category : #accessing }
-CHInstanceCore >> parentScope: anObject [ 
+CHInstanceScope >> parentScope: anObject [ 
 	parentScope := anObject 
 ]
 
 { #category : #accessing }
-CHInstanceCore >> read: aString [ 
+CHInstanceScope >> read: aString [ 
 	^ receiver instVarNamed: aString 
 ]
 
 { #category : #accessing }
-CHInstanceCore >> receiver: anObject [ 
+CHInstanceScope >> receiver: anObject [ 
 	receiver := anObject 
 ]
 
 { #category : #accessing }
-CHInstanceCore >> scopeDefining: aString [ 
+CHInstanceScope >> scopeDefining: aString [ 
 	(self definedVariables includes: aString )
 	ifTrue: [ ^ self ].
 	^ self parentScope scopeDefining: aString 
 ]
 
 { #category : #accessing }
-CHInstanceCore >> write: aString withValue: anInteger [
+CHInstanceScope >> write: aString withValue: anInteger [
 	receiver instVarNamed: aString  put: anInteger  
 ]

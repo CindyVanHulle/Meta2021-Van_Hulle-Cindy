@@ -2,7 +2,7 @@ Class {
 	#name : #CHInterpreter,
 	#superclass : #Object,
 	#instVars : [
-		'receiver',
+		'stack',
 		'globalScope'
 	],
 	#category : #'Champollion-Core'
@@ -10,10 +10,7 @@ Class {
 
 { #category : #running }
 CHInterpreter >> currentScope [ 
-	^ CHInstanceCore new 
-	receiver: self receiver;
-	parentScope: globalScope;
-	yourself 
+	^ self topFrame
 ]
 
 { #category : #running }
@@ -23,8 +20,62 @@ CHInterpreter >> execute: anAST [
 
 { #category : #running }
 CHInterpreter >> execute: anAST withReceiver: anObject [ 
-	receiver := anObject .
-	^ self visitNode: anAST 
+	| result |
+	self pushNewFrame.
+	"Set up the scope chain"
+	self topFrame parentScope: (CHInstanceScope new 
+		receiver: anObject;
+		parentScope: globalScope;
+		yourself);
+	yourself.
+	self topFrame receiver: anObject.
+	result := self visitNode: anAST.
+	self popFrame.
+	^ result
+]
+
+{ #category : #running }
+CHInterpreter >> execute: anAST withReceiver: anObject andArguments: aCollection [
+	| result |
+	self pushNewFrame.
+	"Set up the scope chain"
+	self topFrame parentScope: (CHInstanceScope new 
+		receiver: anObject;
+		parentScope: globalScope;
+		yourself);
+	yourself.
+	self topFrame receiver: anObject.
+	anAST arguments 
+		with: aCollection
+		do: [ :arg :value | self tempAt: arg name put: value ].
+	result := self visitNode: anAST.
+	self popFrame.
+	^ result
+]
+
+{ #category : #running }
+CHInterpreter >> executeMethod: anAST withReceiver: anObject andArguments: aCollection [
+	| result |
+	self pushNewFrame.
+	self topFrame parentScope: (CHInstanceScope new 
+		receiver: anObject;
+		parentScope: globalScope;
+		yourself);
+	yourself.
+	self topFrame receiver: anObject.
+	anAST arguments with: aCollection do: [ :arg :value | self topFrame at: arg name put: value ].
+	anAST temporaryNames do: [ :tempName | self tempAt: tempName  put: nil ].
+	result := self visitNode: anAST body .
+	self popFrame.
+	^ result
+]
+
+{ #category : #running }
+CHInterpreter >> executeMethode: anAST withReceiver: anObject [ 
+	^ self
+	executeMethod: anAST 
+	withReceiver: anObject 
+	andArguments: #() 
 ]
 
 { #category : #running }
@@ -35,17 +86,41 @@ CHInterpreter >> globalEnvironmentAt: aSymbol put: anObject [
 { #category : #running }
 CHInterpreter >> initialize [
 	super initialize .
-	globalScope := CHGlobalScope new
+	globalScope := CHGlobalScope new.
+	stack := CTStack new.
+]
+
+{ #category : #running }
+CHInterpreter >> popFrame [
+	stack pop
+]
+
+{ #category : #running }
+CHInterpreter >> pushNewFrame [
+	| newTop |
+	newTop := CHMethodeScope new.
+	stack push: newTop .
+	^ newTop 
 ]
 
 { #category : #running }
 CHInterpreter >> receiver [ 
-	^ receiver 
+	^ self topFrame receiver 
 ]
 
 { #category : #running }
 CHInterpreter >> scopeDefining: aName [
 	^ self currentScope scopeDefining: aName
+]
+
+{ #category : #running }
+CHInterpreter >> tempAt: aSymbol put: anInteger [
+	self topFrame at: aSymbol put: anInteger 
+]
+
+{ #category : #running }
+CHInterpreter >> topFrame [
+	^ stack top
 ]
 
 { #category : #running }
@@ -66,6 +141,11 @@ CHInterpreter >> visitGlobalNode: aRBGlobalNode [
 ]
 
 { #category : #visiting }
+CHInterpreter >> visitInstanceVariableNode: aRBInstanceVariableNode [ 
+	^ self visitVariableNode: aRBInstanceVariableNode 
+]
+
+{ #category : #visiting }
 CHInterpreter >> visitLiteralArrayNode: aLiteralArrayNode [ 
 	^ aLiteralArrayNode contents
 		collect: [ :literalNode | self visitNode: literalNode ]
@@ -75,6 +155,15 @@ CHInterpreter >> visitLiteralArrayNode: aLiteralArrayNode [
 { #category : #running }
 CHInterpreter >> visitLiteralValueNode: aLiteralValueNode [
 	^ aLiteralValueNode value
+]
+
+{ #category : #running }
+CHInterpreter >> visitMessageNode: aMessageNode [ 
+	| newReceiver method args |
+	newReceiver := self visitNode: aMessageNode receiver.
+	args := aMessageNode arguments collect: [ :each | self visitNode: each ].
+	method := (newReceiver class compiledMethodAt: aMessageNode selector) ast.
+	^ self executeMethod: method withReceiver: newReceiver andArguments: args 
 ]
 
 { #category : #running }
