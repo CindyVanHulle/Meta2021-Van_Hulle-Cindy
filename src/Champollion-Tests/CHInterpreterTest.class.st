@@ -10,7 +10,7 @@ Class {
 
 { #category : #tests }
 CHInterpreterTest >> executeSelector: aSymbol [ 
-	^ self executeSelector: aSymbol withReceiver: nil 
+	^ self executeSelector: aSymbol withReceiver: receiver 
 ]
 
 { #category : #tests }
@@ -28,7 +28,8 @@ CHInterpreterTest >> interpreter [
 { #category : #tests }
 CHInterpreterTest >> setUp [ 
 	super setUp.
-	receiver := CHInterpretable new
+	receiver := CHInterpretable new.
+	interpreter := CHInterpreter new
 ]
 
 { #category : #tests }
@@ -56,6 +57,14 @@ CHInterpreterTest >> testReturnFloat [
 	self
 		assert: (self executeSelector: #returnFloat  )
 		equals: 3.14
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testReturnGlobal [
+	| globalObject |
+	globalObject := Object new.
+	interpreter globalEnvironmentAt: #Global put: globalObject .
+	self assert: (self executeSelector: #returnGlobal) equals: globalObject 
 ]
 
 { #category : #tests }

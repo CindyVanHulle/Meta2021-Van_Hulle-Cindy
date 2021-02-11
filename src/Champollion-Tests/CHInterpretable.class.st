@@ -23,6 +23,13 @@ CHInterpretable >> returnFloat [
 ]
 
 { #category : #'as yet unclassified' }
+CHInterpretable >> returnGlobal [
+	| Global |
+	Global := Object new.
+	^ Global
+]
+
+{ #category : #'as yet unclassified' }
 CHInterpretable >> returnInteger [ 
 	^ 5
 ]

@@ -2,7 +2,8 @@ Class {
 	#name : #CHInterpreter,
 	#superclass : #Object,
 	#instVars : [
-		'receiver'
+		'receiver',
+		'globalScope'
 	],
 	#category : #'Champollion-Core'
 }
@@ -11,6 +12,7 @@ Class {
 CHInterpreter >> currentScope [ 
 	^ CHInstanceCore new 
 	receiver: self receiver;
+	parentScope: globalScope;
 	yourself 
 ]
 
@@ -23,6 +25,17 @@ CHInterpreter >> execute: anAST [
 CHInterpreter >> execute: anAST withReceiver: anObject [ 
 	receiver := anObject .
 	^ self visitNode: anAST 
+]
+
+{ #category : #running }
+CHInterpreter >> globalEnvironmentAt: aSymbol put: anObject [ 
+	globalScope at: aSymbol put: anObject 
+]
+
+{ #category : #running }
+CHInterpreter >> initialize [
+	super initialize .
+	globalScope := CHGlobalScope new
 ]
 
 { #category : #running }
@@ -43,6 +56,13 @@ CHInterpreter >> visitAssignmentNode: anAssignmentNode [
 		write: anAssignmentNode variable name
 		withValue: value.
 	^ value
+]
+
+{ #category : #running }
+CHInterpreter >> visitGlobalNode: aRBGlobalNode [
+	^  globalScope
+		at: aRBGlobalNode name 
+		ifAbsent: [ self error: aRBGlobalNode name, ' not found' ]  
 ]
 
 { #category : #visiting }

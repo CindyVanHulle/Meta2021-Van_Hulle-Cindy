@@ -13,12 +13,12 @@ CHInstanceCore >> definedVariables [
 	^ receiver class allInstVarNames 
 ]
 
-{ #category : #acccessing }
+{ #category : #accessing }
 CHInstanceCore >> parentScope [
-	^ parentScope
+	^ parentScope 
 ]
 
-{ #category : #acccessing }
+{ #category : #accessing }
 CHInstanceCore >> parentScope: anObject [ 
 	parentScope := anObject 
 ]
