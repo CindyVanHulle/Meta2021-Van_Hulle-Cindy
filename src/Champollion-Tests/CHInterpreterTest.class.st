@@ -27,6 +27,14 @@ CHInterpreterTest >> interpreter [
 ]
 
 { #category : #tests }
+CHInterpreterTest >> peanoToInt: aPeanoNumber [
+	"Helper method to transform a peano number to a normal Pharo integer"
+	^ aPeanoNumber 
+	ifEmpty: [ 0 ]
+	ifNonEmpty: [ 1 + (self peanoToInt: aPeanoNumber first ) ]
+]
+
+{ #category : #tests }
 CHInterpreterTest >> setUp [ 
 	super setUp.
 	receiver := CHInterpretable new.

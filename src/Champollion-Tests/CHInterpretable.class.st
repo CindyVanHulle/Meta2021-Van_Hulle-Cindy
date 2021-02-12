@@ -3,7 +3,9 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'x',
-		'collaborator'
+		'collaborator',
+		'current',
+		'evaluationOrder'
 	],
 	#category : #'Champollion-Tests'
 }
@@ -26,6 +28,39 @@ CHInterpretable >> collaborator [
 { #category : #'as yet unclassified' }
 CHInterpretable >> collaborator: anObject [ 
 	collaborator := anObject 
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> evaluateReceiver [
+	evaluationOrder := self next.
+	^ self
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> evaluationOrder [
+	^ evaluationOrder 
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> initialize [ 
+	super initialize .
+	current := { "empty " }.
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> messageArg1: arg1 arg2: arg2 arg3: arg3 [
+	^ { arg1 . arg2 . arg3  }
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> next [ 
+	"Implement a stram as an increment in terms of Peano axiom"
+	| result |
+	result := current.
+	"We increment the counter"
+	current := { current }.
+	"we return the previous result"
+	^ result 
 ]
 
 { #category : #'as yet unclassified' }
