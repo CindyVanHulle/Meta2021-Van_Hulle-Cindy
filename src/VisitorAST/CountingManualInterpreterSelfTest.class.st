@@ -16,3 +16,14 @@ CountingManualInterpreterSelfTest >> testSelfCount [
 	ast acceptVisitor: counting.  
 	self assert: counting numberOfSelf equals: 1
 ]
+
+{ #category : #tests }
+CountingManualInterpreterSelfTest >> testSelfCount2 [
+	"isZero
+	^ x isZero and: [ y isZero ]"
+	| ast counting |   
+	ast := RBParser parseMethod: (Point >> #isZero) sourceCode.  
+	counting := CountingManualInterpreterSelf new.  
+	ast acceptVisitor: counting.  
+	self assert: counting numberOfSelf equals: 0
+]
