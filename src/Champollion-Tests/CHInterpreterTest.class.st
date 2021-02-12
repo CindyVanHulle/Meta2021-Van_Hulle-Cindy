@@ -31,7 +31,8 @@ CHInterpreterTest >> setUp [
 	super setUp.
 	receiver := CHInterpretable new.
 	interpreter := CHInterpreter new.
-	receiver collaborator: CHInterpretable new.
+	collaborator := CHInterpretable new.
+	receiver collaborator: collaborator .
 ]
 
 { #category : #tests }
