@@ -27,6 +27,14 @@ CHInterpreterTest >> interpreter [
 ]
 
 { #category : #tests }
+CHInterpreterTest >> peanoToInt: aPeanoNumber [
+	"Helper method to transform a peano number to a normal Pharo integer"
+	^ aPeanoNumber 
+	ifEmpty: [ 0 ]
+	ifNonEmpty: [ 1 + (self peanoToInt: aPeanoNumber first ) ]
+]
+
+{ #category : #tests }
 CHInterpreterTest >> setUp [ 
 	super setUp.
 	receiver := CHInterpretable new.
@@ -52,6 +60,14 @@ CHInterpreterTest >> testAssignmentReturnsAssignedValue [
 { #category : #tests }
 CHInterpreterTest >> testBalancingStack [
 	self assert: (self executeSelector: #setXAndMessage ) equals: 1000
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testEvaluationOrder [
+	| argumentEvaluationOrder |
+	argumentEvaluationOrder := self executeSelector: #returnEvaluationOrder .
+	self assert: (self peanoToInt: receiver evaluationOrder ) equals: 0.
+	self assert: (argumentEvaluationOrder collect: [ :peano | self peanoToInt: peano ]) equals: #(1 2 3) 
 ]
 
 { #category : #tests }
