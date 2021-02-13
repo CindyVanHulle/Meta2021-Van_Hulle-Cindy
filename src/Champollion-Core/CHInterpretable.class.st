@@ -1,13 +1,13 @@
 Class {
 	#name : #CHInterpretable,
-	#superclass : #Object,
+	#superclass : #CHInterpretableSuperclass,
 	#instVars : [
 		'x',
 		'collaborator',
-		'current',
-		'evaluationOrder'
+		'evaluationOrder',
+		'current'
 	],
-	#category : #'Champollion-Tests'
+	#category : #'Champollion-Core'
 }
 
 { #category : #'as yet unclassified' }
