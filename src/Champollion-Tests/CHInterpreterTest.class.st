@@ -63,11 +63,28 @@ CHInterpreterTest >> testBalancingStack [
 ]
 
 { #category : #tests }
+CHInterpreterTest >> testDoesNotUnderstandReifiesMessageWithArguments [
+	self assert: (self executeSelector: #sendMessageNotUnderstood ) arguments  
+	equals: #( 17 27)
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testDoesNotUnderstandReifiesMessageWithSelector [
+	self assert: (self executeSelector: #sendMessageNotUnderstood ) selector 
+	equals: #messageIDoNotUnderstandWithArg1:withArg2: 
+]
+
+{ #category : #tests }
 CHInterpreterTest >> testEvaluationOrder [
 	| argumentEvaluationOrder |
 	argumentEvaluationOrder := self executeSelector: #returnEvaluationOrder .
 	self assert: (self peanoToInt: receiver evaluationOrder ) equals: 0.
 	self assert: (argumentEvaluationOrder collect: [ :peano | self peanoToInt: peano ]) equals: #(1 2 3) 
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testFailingPrimitive [
+	self assert: (self executeSelector: #callingFailingPrimitive ) equals: 'failure'
 ]
 
 { #category : #tests }
@@ -78,6 +95,21 @@ CHInterpreterTest >> testInstanceVariableStoreInMethodActivationDoesNotChangeSen
 	self executeSelector: #changeCollaboratorX .
 	self assert: receiver x equals: 200.
 	self assert: collaborator x equals: 100
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testLookupInSuperclass [
+	self assert: (self executeSelector: #sendMessageInSuperclass ) equals: 5
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testLookupRedefineMethod [
+	self assert: (self executeSelector: #overriddenMethod ) equals: 5
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testLookupSuperMessage [
+	self assert: (self executeSelector: #doesSuperLookupFromSuperclass )
 ]
 
 { #category : #tests }
@@ -149,6 +181,11 @@ CHInterpreterTest >> testSelfSend [
 ]
 
 { #category : #tests }
+CHInterpreterTest >> testSmallIntAddPrimitive [
+	self assert: (self executeSelector: #smallintAdd ) equals: 6
+]
+
+{ #category : #tests }
 CHInterpreterTest >> testStore100IntoX [
 	receiver x: 17.
 	self executeSelector: #store100IntoX .
@@ -163,4 +200,16 @@ CHInterpreterTest >> testUnassignedTempHasNilValue [
 { #category : #tests }
 CHInterpreterTest >> testWriteTemporaryVariable [
 	self assert: (self executeSelector: #writeTemporaryVariable ) equals: 100
+]
+
+{ #category : #tests }
+CHInterpreterTest >> visitMessageNode: aMessageNode [ 
+	| newReceiver method args lookupClass pragma |
+	newReceiver := self visitNode: aMessageNode receiver.
+	args := aMessageNode arguments collect: [ :each | self visitNode: each ].
+	lookupClass := aMessageNode receiver isSuper 
+		ifTrue: [ self currentMethod methodClass superclass ]
+		ifFalse: [ newReceiver class ].
+	method := self lookup: aMessageNode selector fromClass: lookupClass.
+	^ self executeMethod: method withReceiver: newReceiver  andArguments: args
 ]

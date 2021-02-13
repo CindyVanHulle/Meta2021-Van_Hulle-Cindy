@@ -1,14 +1,19 @@
 Class {
 	#name : #CHInterpretable,
-	#superclass : #Object,
+	#superclass : #CHInterpretableSuperclass,
 	#instVars : [
 		'x',
 		'collaborator',
-		'current',
-		'evaluationOrder'
+		'evaluationOrder',
+		'current'
 	],
-	#category : #'Champollion-Tests'
+	#category : #'Champollion-Core'
 }
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> callingFailingPrimitive [
+	^ self failingPrimitive 
+]
 
 { #category : #'as yet unclassified' }
 CHInterpretable >> changeCollaboratorWithArgument [
@@ -31,6 +36,21 @@ CHInterpretable >> collaborator: anObject [
 ]
 
 { #category : #'as yet unclassified' }
+CHInterpretable >> currentMethod [ 
+	^ self tempAt: #___method
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> doesNotUnderstand: aMessage [
+	^ aMessage 
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> doesSuperLookupFromSuperclass [
+	^ super isInSuperclass 
+]
+
+{ #category : #'as yet unclassified' }
 CHInterpretable >> evaluateReceiver [
 	evaluationOrder := self next.
 	^ self
@@ -42,9 +62,20 @@ CHInterpretable >> evaluationOrder [
 ]
 
 { #category : #'as yet unclassified' }
+CHInterpretable >> failingPrimitive [
+	<primitive: 1>
+	^ 'failure'
+]
+
+{ #category : #'as yet unclassified' }
 CHInterpretable >> initialize [ 
 	super initialize .
 	current := { "empty " }.
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> isInSuperclass [
+	^ false
 ]
 
 { #category : #'as yet unclassified' }
@@ -61,6 +92,11 @@ CHInterpretable >> next [
 	current := { current }.
 	"we return the previous result"
 	^ result 
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> overriddenMethod [ 
+	^ super overriddenMethod 
 ]
 
 { #category : #'as yet unclassified' }
@@ -120,6 +156,16 @@ CHInterpretable >> returnUnassignedTemp [
 { #category : #'as yet unclassified' }
 CHInterpretable >> returnX [
 	^ x
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> sendMessageInSuperclass [
+	^ self methodInSuperclass 
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> sendMessageNotUnderstood [
+	^ self messageIDoNotUnderstandWithArg1: 17 withArg2: 27
 ]
 
 { #category : #'as yet unclassified' }
