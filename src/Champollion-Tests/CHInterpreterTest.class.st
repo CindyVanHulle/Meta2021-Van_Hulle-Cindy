@@ -63,11 +63,28 @@ CHInterpreterTest >> testBalancingStack [
 ]
 
 { #category : #tests }
+CHInterpreterTest >> testDoesNotUnderstandReifiesMessageWithArguments [
+	self assert: (self executeSelector: #sendMessageNotUnderstood ) arguments  
+	equals: #( 17 27)
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testDoesNotUnderstandReifiesMessageWithSelector [
+	self assert: (self executeSelector: #sendMessageNotUnderstood ) selector 
+	equals: #messageIDoNotUnderstandWithArg1:withArg2: 
+]
+
+{ #category : #tests }
 CHInterpreterTest >> testEvaluationOrder [
 	| argumentEvaluationOrder |
 	argumentEvaluationOrder := self executeSelector: #returnEvaluationOrder .
 	self assert: (self peanoToInt: receiver evaluationOrder ) equals: 0.
 	self assert: (argumentEvaluationOrder collect: [ :peano | self peanoToInt: peano ]) equals: #(1 2 3) 
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testFailingPrimitive [
+	self assert: (self executeSelector: #callingFailingPrimitive ) equals: 'failure'
 ]
 
 { #category : #tests }
@@ -161,6 +178,11 @@ CHInterpreterTest >> testReturnSuper [
 CHInterpreterTest >> testSelfSend [
 	receiver x: 100.
 	self assert: (self executeSelector: #sendMessageReturnX ) equals:100
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testSmallIntAddPrimitive [
+	self assert: (self executeSelector: #smallintAdd ) equals: 6
 ]
 
 { #category : #tests }

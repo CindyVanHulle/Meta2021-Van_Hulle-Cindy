@@ -11,6 +11,11 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+CHInterpretable >> callingFailingPrimitive [
+	^ self failingPrimitive 
+]
+
+{ #category : #'as yet unclassified' }
 CHInterpretable >> changeCollaboratorWithArgument [
 	collaborator x: 500
 ]
@@ -36,6 +41,11 @@ CHInterpretable >> currentMethod [
 ]
 
 { #category : #'as yet unclassified' }
+CHInterpretable >> doesNotUnderstand: aMessage [
+	^ aMessage 
+]
+
+{ #category : #'as yet unclassified' }
 CHInterpretable >> doesSuperLookupFromSuperclass [
 	^ super isInSuperclass 
 ]
@@ -49,6 +59,12 @@ CHInterpretable >> evaluateReceiver [
 { #category : #'as yet unclassified' }
 CHInterpretable >> evaluationOrder [
 	^ evaluationOrder 
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> failingPrimitive [
+	<primitive: 1>
+	^ 'failure'
 ]
 
 { #category : #'as yet unclassified' }
@@ -145,6 +161,11 @@ CHInterpretable >> returnX [
 { #category : #'as yet unclassified' }
 CHInterpretable >> sendMessageInSuperclass [
 	^ self methodInSuperclass 
+]
+
+{ #category : #'as yet unclassified' }
+CHInterpretable >> sendMessageNotUnderstood [
+	^ self messageIDoNotUnderstandWithArg1: 17 withArg2: 27
 ]
 
 { #category : #'as yet unclassified' }

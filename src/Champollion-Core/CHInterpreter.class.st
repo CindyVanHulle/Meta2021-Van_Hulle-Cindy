@@ -3,10 +3,16 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'stack',
-		'globalScope'
+		'globalScope',
+		'primitives'
 	],
 	#category : #'Champollion-Core'
 }
+
+{ #category : #running }
+CHInterpreter >> argumentAt: anInteger [ 
+	^ self tempAt: (self currentMethod arguments at: anInteger ) name
+]
 
 { #category : #running }
 CHInterpreter >> currentScope [ 
@@ -74,6 +80,16 @@ CHInterpreter >> executeMethode: anAST withReceiver: anObject [
 ]
 
 { #category : #running }
+CHInterpreter >> executePrimitiveMethod: anAST [ 
+	| primitiveNumber |
+	primitiveNumber := anAST pragmas 
+		detect: [ :each |each isPrimitive ]
+		ifFound: [ :aPragmaPrimitive | aPragmaPrimitive arguments first value ]
+		ifNone: [ self error: 'Not a primitive method' ].
+	^ self perform: (primitives at: primitiveNumber )
+]
+
+{ #category : #running }
 CHInterpreter >> globalEnvironmentAt: aSymbol put: anObject [ 
 	globalScope at: aSymbol put: anObject 
 ]
@@ -83,6 +99,13 @@ CHInterpreter >> initialize [
 	super initialize .
 	globalScope := CHGlobalScope new.
 	stack := CTStack new.
+	primitives := Dictionary new.
+	self initializePrimitiveTable.
+]
+
+{ #category : #running }
+CHInterpreter >> initializePrimitiveTable [
+	primitives at: 1 put: #primitiveSmallIntegerAdd
 ]
 
 { #category : #running }
@@ -103,6 +126,16 @@ CHInterpreter >> popFrame [
 ]
 
 { #category : #running }
+CHInterpreter >> primitiveSmallIntegerAdd [
+	| receiver argument |
+	receiver := self receiver.
+	receiver class = SmallInteger 
+		ifFalse: [ CHPrimitiveFail signal ].
+	argument  := self argumentAt: 1.
+	^ receiver + argument
+]
+
+{ #category : #running }
 CHInterpreter >> pushNewFrame [
 	| newTop |
 	newTop := CHMethodeScope new.
@@ -118,6 +151,28 @@ CHInterpreter >> receiver [
 { #category : #running }
 CHInterpreter >> scopeDefining: aName [
 	^ self currentScope scopeDefining: aName
+]
+
+{ #category : #running }
+CHInterpreter >> send: aSelector receiver: newReceiver lookupFromClass: lookupClass arguments: arguments [
+		"Lookup a selector from a class, and activate the method.
+		Handle does not understand case and message reification on demande if lookup fails."
+		| method |
+		method := self lookup: aSelector fromClass: lookupClass .
+		method ifNil: [ | messageReification | 
+			messageReification := Message 
+				selector: aSelector 
+				arguments: arguments .
+			^ self send: #doesNotUnderstand:
+					 receiver: newReceiver
+					 lookupFromClass: lookupClass 
+					 arguments: { messageReification } ].
+		^ self execute: method withReceiver: newReceiver  andArguments: arguments   
+]
+
+{ #category : #running }
+CHInterpreter >> smallintAdd [
+	^ 1 + 5
 ]
 
 { #category : #running }
@@ -172,15 +227,23 @@ CHInterpreter >> visitLiteralValueNode: aLiteralValueNode [
 
 { #category : #running }
 CHInterpreter >> visitMessageNode: aMessageNode [ 
-	| newReceiver method args |
+	| newReceiver args lookupClass |
 	newReceiver := self visitNode: aMessageNode receiver.
 	args := aMessageNode arguments collect: [ :each | self visitNode: each ].
-	method := self lookup: aMessageNode selector fromClass: newReceiver class.
-	^ self execute: method withReceiver: newReceiver andArguments: args 
+	lookupClass := aMessageNode receiver isSuperVariable
+		ifTrue: [ self currentMethod methodClass superclass ]
+		ifFalse: [ newReceiver class ].
+	^ self
+		send: aMessageNode 
+		receiver: newReceiver 
+		lookupFromClass: lookupClass 
+		arguments: args asArray  
 ]
 
 { #category : #running }
 CHInterpreter >> visitMethodNode: aMethodeNode [
+	[ aMethodeNode isPrimitive ifTrue: [ ^ self executePrimitiveMethod: aMethodeNode  ]]
+		on: CHPrimitiveFail do: [ :err | "Nothing, just continue with the method body"].
 	^ self visitNode: aMethodeNode body
 ]
 
