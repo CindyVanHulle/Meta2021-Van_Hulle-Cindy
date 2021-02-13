@@ -74,6 +74,14 @@ CHInterpretable >> returnEmptyLiteralArray [
 ]
 
 { #category : #'as yet unclassified' }
+CHInterpretable >> returnEvaluationOrder [
+	^ self evaluateReceiver 
+	messageArg1: self next 
+	arg2: self next 
+	arg3: self next 
+]
+
+{ #category : #'as yet unclassified' }
 CHInterpretable >> returnFloat [
 	^ 3.14
 ]

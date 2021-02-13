@@ -123,6 +123,12 @@ CHInterpreter >> topFrame [
 	^ stack top
 ]
 
+{ #category : #visiting }
+CHInterpreter >> visitArrayNode: aRBArrayNode [
+	^ aRBArrayNode statements 
+	collect: [ :e | self visitNode: e ] as: Array
+]
+
 { #category : #running }
 CHInterpreter >> visitAssignmentNode: anAssignmentNode [
 	| value |
