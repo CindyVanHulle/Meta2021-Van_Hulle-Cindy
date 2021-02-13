@@ -81,6 +81,21 @@ CHInterpreterTest >> testInstanceVariableStoreInMethodActivationDoesNotChangeSen
 ]
 
 { #category : #tests }
+CHInterpreterTest >> testLookupInSuperclass [
+	self assert: (self executeSelector: #sendMessageInSuperclass ) equals: 5
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testLookupRedefineMethod [
+	self assert: (self executeSelector: #overriddenMethod ) equals: 5
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testLookupSuperMessage [
+	self assert: (self executeSelector: #doesSuperLookupFromSuperclass )
+]
+
+{ #category : #tests }
 CHInterpreterTest >> testReturnBoolean [
 	"Do not use deny: to make explicit that we expect the value false"
 	self
@@ -163,4 +178,16 @@ CHInterpreterTest >> testUnassignedTempHasNilValue [
 { #category : #tests }
 CHInterpreterTest >> testWriteTemporaryVariable [
 	self assert: (self executeSelector: #writeTemporaryVariable ) equals: 100
+]
+
+{ #category : #tests }
+CHInterpreterTest >> visitMessageNode: aMessageNode [ 
+	| newReceiver method args lookupClass pragma |
+	newReceiver := self visitNode: aMessageNode receiver.
+	args := aMessageNode arguments collect: [ :each | self visitNode: each ].
+	lookupClass := aMessageNode receiver isSuper 
+		ifTrue: [ self currentMethod methodClass superclass ]
+		ifFalse: [ newReceiver class ].
+	method := self lookup: aMessageNode selector fromClass: lookupClass.
+	^ self executeMethod: method withReceiver: newReceiver  andArguments: args
 ]

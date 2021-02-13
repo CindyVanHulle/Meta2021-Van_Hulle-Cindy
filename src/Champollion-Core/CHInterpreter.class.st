@@ -57,14 +57,9 @@ CHInterpreter >> execute: anAST withReceiver: anObject andArguments: aCollection
 CHInterpreter >> executeMethod: anAST withReceiver: anObject andArguments: aCollection [
 	| result |
 	self pushNewFrame.
-	self topFrame parentScope: (CHInstanceScope new 
-		receiver: anObject;
-		parentScope: globalScope;
-		yourself);
-	yourself.
-	self topFrame receiver: anObject.
-	anAST arguments with: aCollection do: [ :arg :value | self topFrame at: arg name put: value ].
-	anAST temporaryNames do: [ :tempName | self tempAt: tempName  put: nil ].
+	self tempAt: #___method put: anAST.
+	self tempAt: #self put: anObject.  
+	anAST arguments with: aCollection do: [ :arg :value | self tempAt: arg name put: value ].
 	result := self visitNode: anAST body .
 	self popFrame.
 	^ result
@@ -88,6 +83,18 @@ CHInterpreter >> initialize [
 	super initialize .
 	globalScope := CHGlobalScope new.
 	stack := CTStack new.
+]
+
+{ #category : #running }
+CHInterpreter >> lookup: aSymbol fromClass: aClass [ 
+	"return the AST of a method or nil if none is found"
+	"If the class defines a method for the selector, return the AST corresponding to the method"
+	(aClass includesSelector: aSymbol )
+		ifTrue: [ ^ (aClass compiledMethodAt: aSymbol ) ast ].
+	"Otherwise lookup recursively in the superclass. If we reach the end of the hierarchy return nil"
+	^ aClass superclass 
+		ifNil: [ nil ]
+		ifNotNil: [ self lookup: aSymbol fromClass: aClass superclass ]
 ]
 
 { #category : #running }
@@ -168,8 +175,8 @@ CHInterpreter >> visitMessageNode: aMessageNode [
 	| newReceiver method args |
 	newReceiver := self visitNode: aMessageNode receiver.
 	args := aMessageNode arguments collect: [ :each | self visitNode: each ].
-	method := (newReceiver class compiledMethodAt: aMessageNode selector) ast.
-	^ self executeMethod: method withReceiver: newReceiver andArguments: args 
+	method := self lookup: aMessageNode selector fromClass: newReceiver class.
+	^ self execute: method withReceiver: newReceiver andArguments: args 
 ]
 
 { #category : #running }
