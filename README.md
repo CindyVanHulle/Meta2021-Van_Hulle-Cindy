@@ -18,6 +18,7 @@
       - Counter
       - Dice
       - Pierre Feuille Ciseaux
+      - Expression
       - VisitorExample
       - VisitorAST
       - Fun with interpreters: jusqu'a la partie 5.4. Packages Champollions.
