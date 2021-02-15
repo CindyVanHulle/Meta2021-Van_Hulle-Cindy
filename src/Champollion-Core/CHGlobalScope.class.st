@@ -8,7 +8,7 @@ Class {
 }
 
 { #category : #initialization }
-CHGlobalScope >> at: aKey put: aValue [
+CHGlobalScope >> at: aKey put: aValue [ 
 	globalsDictionary at: aKey put: aValue 
 ]
 
@@ -18,8 +18,8 @@ CHGlobalScope >> globalsDictionary: anObject [
 ]
 
 { #category : #initialization }
-CHGlobalScope >> initialize [ 
-	super initialize.
+CHGlobalScope >> initialize [
+	super initialize .
 	globalsDictionary := Dictionary new
 ]
 
@@ -30,6 +30,5 @@ CHGlobalScope >> read: aString [
 
 { #category : #initialization }
 CHGlobalScope >> scopeDefining: aString [ 
-	"I'm the root scope..."
 	^ self
 ]

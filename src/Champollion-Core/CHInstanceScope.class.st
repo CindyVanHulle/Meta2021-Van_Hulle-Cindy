@@ -14,8 +14,8 @@ CHInstanceScope >> definedVariables [
 ]
 
 { #category : #accessing }
-CHInstanceScope >> parentScope [
-	^ parentScope 
+CHInstanceScope >> parentScope [ 
+	^ parentScope
 ]
 
 { #category : #accessing }
@@ -36,11 +36,11 @@ CHInstanceScope >> receiver: anObject [
 { #category : #accessing }
 CHInstanceScope >> scopeDefining: aString [ 
 	(self definedVariables includes: aString )
-	ifTrue: [ ^ self ].
+		ifTrue: [ ^ self ].
 	^ self parentScope scopeDefining: aString 
 ]
 
 { #category : #accessing }
-CHInstanceScope >> write: aString withValue: anInteger [
+CHInstanceScope >> write: aString withValue: anInteger [ 
 	receiver instVarNamed: aString  put: anInteger  
 ]
