@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'receiver',
-		'globalScope'
+		'globalScope',
+		'stack'
 	],
 	#category : #'Champollion-Core'
 }
@@ -23,8 +24,19 @@ CHInterpreter >> execute: anAST [
 
 { #category : #running }
 CHInterpreter >> execute: anAST withReceiver: anObject [ 
-	receiver := anObject .
+	self pushNewFrame.
+	self topFrame receiver: anObject .
 	^ self visitNode: anAST 
+]
+
+{ #category : #running }
+CHInterpreter >> executeMethod: anAST withReceiver: anObject [ 
+	| result |
+	self pushNewFrame.
+	self topFrame receiver: anObject .
+	result := self visitNode: anAST.
+	self popFrame.
+	^ result
 ]
 
 { #category : #running }
@@ -35,17 +47,36 @@ CHInterpreter >> globalEnvironmentAt: aSymbol  put: anObject [
 { #category : #running }
 CHInterpreter >> initialize [
 	super initialize.
-	globalScope := CHGlobalScope new
+	globalScope := CHGlobalScope new.
+	stack := CTStack new.
+]
+
+{ #category : #running }
+CHInterpreter >> popFrame [ 
+	stack pop
+]
+
+{ #category : #running }
+CHInterpreter >> pushNewFrame [ 
+	| newTop |
+	newTop := CHMethodScope new.
+	stack push: newTop.
+	^ newTop 
 ]
 
 { #category : #running }
 CHInterpreter >> receiver [ 
-	^ receiver
+	^ self topFrame receiver
 ]
 
 { #category : #running }
 CHInterpreter >> scopeDefining: aName [
 	^ self currentScope scopeDefining: aName 
+]
+
+{ #category : #running }
+CHInterpreter >> topFrame [ 
+	^ stack top
 ]
 
 { #category : #running }
@@ -65,6 +96,11 @@ CHInterpreter >> visitGlobalNode: aRBGlobalNode [
 ]
 
 { #category : #running }
+CHInterpreter >> visitInstanceVariableNode: aRBVariableNode [ 
+	^ self receiver instVarNamed: aRBVariableNode name
+]
+
+{ #category : #running }
 CHInterpreter >> visitLiteralArrayNode: aLiteralArrayNode [
 	^ aLiteralArrayNode  contents 
 		collect: [ :literalNode  | self visitNode: literalNode ] as: Array 
@@ -73,6 +109,14 @@ CHInterpreter >> visitLiteralArrayNode: aLiteralArrayNode [
 { #category : #running }
 CHInterpreter >> visitLiteralValueNode: aLiteralValueNode [
 	^ aLiteralValueNode value
+]
+
+{ #category : #running }
+CHInterpreter >> visitMessageNode: aMessageNode [
+	| newReceiver method |
+	newReceiver := self visitNode: aMessageNode receiver.
+	method := (newReceiver class compiledMethodAt: aMessageNode selector) ast.
+	^ self execute: method withReceiver: newReceiver
 ]
 
 { #category : #running }

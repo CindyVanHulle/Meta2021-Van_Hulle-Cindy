@@ -3,7 +3,8 @@ Class {
 	#superclass : #TestCase,
 	#instVars : [
 		'interpreter',
-		'receiver'
+		'receiver',
+		'collaborator'
 	],
 	#category : #'Champollion-Tests'
 }
@@ -28,12 +29,29 @@ CHInterpreterTest >> interpreter [
 { #category : #tests }
 CHInterpreterTest >> setUp [ 
 	super setUp.
-	receiver := CHInterpretable new
+	receiver := CHInterpretable new.
+	receiver collaborator: CHInterpretable new.
+	receiver collaborator: collaborator 
 ]
 
 { #category : #tests }
 CHInterpreterTest >> testAssignmentReturnsAssignedValue [ 
 	self assert: (self executeSelector: #store100IntoX ) equals: 100
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testBalancingStack [ 
+	self assert: (self executeSelector: #setXanMessage ) equals: 1000
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testInstanceVariableStoreInMethodActivationDoesNotChangeSender [ 
+	receiver x: 200.
+	collaborator x: 300.
+	"changeCollaboratorX will replace collaborator's x but not thereceiver's"
+	self executeSelector: #changeCollaboratorX.
+	self assert: receiver x equals: 200.
+	self assert: collaborator x equals: 100
 ]
 
 { #category : #tests }
@@ -92,6 +110,12 @@ CHInterpreterTest >> testReturnSelf [
 CHInterpreterTest >> testReturnSuper [
 	"Convey our intention of checking identity by using an explicit identity check"
 	self assert: (self executeSelector: #returnSuper withReceiver: receiver ) == receiver
+]
+
+{ #category : #tests }
+CHInterpreterTest >> testSelfSend [ 
+	receiver x: 100.
+	self assert: (self executeSelector: #sendMessageReturnX ) equals: 100
 ]
 
 { #category : #tests }
